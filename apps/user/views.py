@@ -115,14 +115,14 @@ class RegisterView(View):
         info = {'confirm':user.id}
         token = serializer.dumps(info)
         token = token.decode()
-        
+
         #发邮件
         subject = '优必朋欢迎信息'
-        message = '<h1>%s , 欢迎您成为天天生鲜注册会员</h1> %s ,请点击下面链接激活您的账户<br/><a href="http"//127.0.0.1:8000/user/active/%s">http"//127.0.0.1:8000/user/active/%s</a>'%(username,token,token)
+        message = ''
         sender = settings.EMAIL_FROM
         receiver = [email]
-        #html_message =
-        send_mail(subject,message,sender,receiver)
+        html_message ='<h1>欢迎您成为天天生鲜注册会员</h1> %s ,请点击下面链接激活您的账户<br/><a href="http://127.0.0.1:8000/user/active/%s">http://127.0.0.1:8000/user/active/%s</a>'%(username,token,token)
+        send_mail(subject,message,sender,receiver,html_message=html_message)
         return redirect(reverse('goods:index'))
 
 class ActiveView(View):
@@ -131,12 +131,14 @@ class ActiveView(View):
         #进行解密，获取需要激活的用户信息
         serializer = Serializer(settings.SECRE_KEY, 3600)
         try:
-            info = serializer.load(token)
+            info = serializer.loads(token)
             user_id = info['confirm']
 
             user = User.objects.get(id = user_id)
             user.is_active = 1
             user.save()
+
+            return redirect(reverse('goods:index'))
         except SignatureExpired as e:
             #激活链接已过期
             return  HttpResponse('激活链接已过期')
