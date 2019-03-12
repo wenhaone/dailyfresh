@@ -1,12 +1,22 @@
 -类视图
 as_view()  返回内部的view
 
+python manage.py makemigrations
+python manage.py  migrate
+
+UPDATE table_name SET field1=new-value1, field2=new-value2 where id=1
+select * from df_user  \G;  格式化显示
+
+pip install Pillow -i https://pypi.douban.com/simple/
+
+pip install Pillow
 pip install pymysql
-pip install django-tinymce
+pip install django-tinymce  富文本
 pip install HTMLField
 pip install itsdangerouse
 pip install celery
 
+manage.py
 redis 安装 ：http://www.runoob.com/note/36178
 直接去安装目录下 有exe文件
 

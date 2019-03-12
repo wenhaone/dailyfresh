@@ -125,3 +125,6 @@ EMAIL_PORT = 25     #发件箱的SMTP服务器端口
 EMAIL_HOST_USER = '18612398924@163.com'    #发送邮件的邮箱地址
 EMAIL_HOST_PASSWORD = 'a7822110'         #发送邮件的邮箱密码(这里使用的是授权码)
 EMAIL_FROM = '优必朋<18612398924@163.com>'
+
+#配置登录url地址
+LOGIN_URL='/user/login'

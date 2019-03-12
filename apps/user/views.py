@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.contrib.auth import  authenticate,login
 from django.views.generic import View
 from django.http import  HttpResponse
 from django.conf import settings
@@ -29,6 +30,8 @@ def register(request):
         # 2、进行数据校验      all可以校验数据
         if not all([username, password, email]):
             return render(request, 'register.html', {'errmsg': '数据不完整'})
+        #业务处理：登录校验
+
         # 校验邮箱
         if not re.match(r'^[a-z0-9][\w.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$', email):
             return render(request, 'register.html', {'errmsg': '邮箱不合法'})
@@ -143,4 +146,55 @@ class ActiveView(View):
 
 class LoginView(View):
     def get(self,request):
-        return render(request,'login.html')
+
+        if 'username' in request.COOKIES:
+           username = request.COOKIES.get('username')
+           checked = 'checked'
+        else:
+            username = ''
+            checked = ''
+        return render(request,'login.html',{'username':username,'checked':checked})
+
+    def post(self,request):
+        #接受数据
+        username = request.POST.get('username')
+        password = request.POST.get('pwd')
+        #校验数据
+        if not all([username,password]):
+            return render(request,'login.html',{'errmsg':'数据不完整'})
+        #登录校验
+        user = authenticate(username=username,password=password)
+        if user is not None:
+            if user.is_active:
+                login(request,user)
+                #判断是否记住用户名
+
+                #获取登陆后所要跳转的地址
+
+                response =  redirect(reverse('goods:index'))
+                remember = request.POST.get('remember')
+                if remember == 'on':
+                    response.set_cookie('username',username,max_age=7*24*3600)
+                else:
+                    response.delete_cookie('username')
+                return  response
+            #  print("User is valid ,active and authenticated")
+            else:
+                return render(request,'login.html',{'errmsg':'账户未激活'})
+        else:
+            return render(request,'login.html',{'errmmsg':'用户名或密码错误'})
+        #返回应答
+
+class UserInfoView(View):
+    def get(self,request):
+
+        return render(request,'user_center_info.html',{'page':'user'})
+
+
+class UserOrderView(View):
+    def get(self, request):
+        return render(request, 'user_center_order.html',{'page':'order'})
+
+class AddressView(View):
+    def get(self, request):
+        return render(request, 'user_center_site.html',{'page':'address'})
